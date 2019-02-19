@@ -19,7 +19,7 @@ Produces plot of damped suspension system. Gives user sliders to change m, k, c
 #### Pendulum()
 Animation of a pendulum produced using Runge Kutta to solve system of ODEs. Could alter this to user different solvers?
 
-###Linear Algebra
+### Linear Algebra
 
 #### CoordinateTransform()
 Takes input from user to transform shapes using transformation matrix. Also option to show eigens.
