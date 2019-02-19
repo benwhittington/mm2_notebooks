@@ -531,3 +531,63 @@ def exportWav(audioData):
     audioData = np.asarray(audioData, dtype=np.int16)
     
     wavfile.write(path+'exportedAudio.wav',int(sampFreq), audioData)
+
+
+##########
+
+# Even odd
+
+##########
+
+def even(x):
+    return np.cos(x)
+
+def odd(x):
+    return np.sin(x)
+
+def EvenOdd():
+    funcs = {"Even":even, "Odd":odd}
+    f1_drop = widgets.Dropdown(options=funcs)
+    f2_drop = widgets.Dropdown(options=funcs)
+
+    display(
+        widgets.VBox([
+            widgets.HBox([
+                f1_drop,
+                f2_drop
+                ]),
+            widgets.interactive_output(displayEvenOdd, {'f1':f1_drop, 'f2':f2_drop})
+        ])
+    )
+
+def displayEvenOdd(f1, f2):
+    
+    x = np.linspace(-np.pi, np.pi)
+    
+    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(16, 8))
+    fig.tight_layout()
+
+    ax1.plot(x, f1(x), color='C0')
+    ax1.set_title('Function 1')
+    ax2.plot(x, f2(x), color='C1')
+    ax2.set_title('Function 2')
+    ax3.plot(x, np.multiply(f1(x), f2(x)), color='C3')
+    ax3.set_title('Function 1 * Function 2')
+
+    ax1.axvline(0, color='k', linewidth=0.5)
+    ax2.axvline(0, color='k', linewidth=0.5)
+    ax3.axvline(0, color='k', linewidth=0.5)
+
+    ax1.yaxis.set_ticklabels([])
+    ax1.yaxis.set_ticks([])
+
+    ax2.yaxis.set_ticklabels([])
+    ax2.yaxis.set_ticks([])
+
+    ax3.yaxis.set_ticklabels([])
+    ax3.yaxis.set_ticks([])
+
+    
+
+    
+
