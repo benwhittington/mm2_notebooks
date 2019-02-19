@@ -54,6 +54,9 @@ Plots the signal and the Fourier analysis of the signal. Also has slider to cons
 #### FilterFreqs()
 Plots the signal and the Fourier analysis of the signal. Also allows user to filter out a band of frequencies and review what the signal would look like without those frequencies.
 
+#### EvenOdd()
+Demo of even vs. odd function multiplication
+
 
 
 
