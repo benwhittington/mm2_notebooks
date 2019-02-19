@@ -936,6 +936,12 @@ def f1_2D(x, y):
 def f2_2D(x, y):
 	return -x/2 + 3/2
 
+def f3_2D(x, y):
+	return -3*x + 2
+
+def f4_2D(x, y):
+	return y + 3
+
 def f1_3D(x1, x2, x3):
 	"""
 		x1 dependant
@@ -966,7 +972,7 @@ def f5_3D(x1, x2, x3):
 def f6_3D(x1, x2, x3):
 	return -0.2*x1 + 0.2*x2 + 1.23
 
-def jacobi(init, eqns, tol=0.001):
+def jacobi(init, eqns, tol=1, step=20):
 	""" 
 		Runs Jacobi's method of solving systems of linear equations
 
@@ -1009,7 +1015,7 @@ def jacobi(init, eqns, tol=0.001):
 	nextIt = np.zeros(n)
 	sumSquares = 1
 	count = 0
-	while sumSquares > tol and count < 25:
+	while count < step:
 		for j in range(n):
 			# loop each eqn
 			# unpack last iteration values into each equation.
@@ -1023,7 +1029,7 @@ def jacobi(init, eqns, tol=0.001):
 
 	return out, count
 
-def gaussSeidel(init, eqns, tol=0.001):
+def gaussSeidel(init, eqns, tol=1, step=20):
 	""" 
 		Performs Gauss Seidel method of solving systems of linear equations
 
@@ -1066,7 +1072,7 @@ def gaussSeidel(init, eqns, tol=0.001):
 	nextIt = np.zeros(n)
 	count = 0
 	sumSquares = 1
-	while sumSquares > tol and count < 25:
+	while count < step:
 		nextIt[0] = eqns[0](*(out[-1]))
 		# print(n-1)
 		for j in range(1,n):
@@ -1241,18 +1247,18 @@ def IterativeMethods2D(start=[0,0]):
 
 	"""
 	eqnOpt = {'Sys. 1': 1, 'Sys. 2':2}
-	tol_slider = widgets.FloatLogSlider(1, min=-10, max=0, step=1, description='Tolerance', continuous_update=False)
+	step_slider = widgets.IntSlider(0, min=0, max=20, step=1, description='Step', continuous_update=False)
 	printOut_check = widgets.Checkbox(value=False, description='Show Iterations')
 	eqns_drop = widgets.Dropdown(options=eqnOpt)
 	
 	display(widgets.VBox([
 		widgets.HBox([
-			tol_slider,
+			step_slider,
 			eqns_drop,
 			printOut_check
 	]),
 		widgets.interactive_output(iterative2D, {
-			'tol':tol_slider,
+			'step':step_slider,
 			'start':widgets.fixed(start),
 			'sysSelect':eqns_drop,
 			'showIts':printOut_check
@@ -1283,8 +1289,7 @@ def plotIterative2D(ax, xks, style='-',label=''):
 	"""
 	ax.plot(xks[:,0], xks[:,1], style, label=label)
 
-
-def iterative2D(tol, start, sysSelect, showIts):
+def iterative2D(step, start, sysSelect, showIts):
 	"""
 		Main function for 2D iterative methods. Calls iterative solvers and does printing/plotting
 
@@ -1313,10 +1318,14 @@ def iterative2D(tol, start, sysSelect, showIts):
 		eqn1 = f1_2D
 		eqn2 = f2_2D
 
+	elif sysSelect==2:
+		eqn1 = f3_2D
+		eqn2 = f4_2D
+
 	buf = 2
 
-	jOut, jCount = jacobi(start, [eqn1, eqn2], tol=tol)
-	gOut, gCount = gaussSeidel(start, [eqn1, eqn2], tol=tol)
+	jOut, jCount = jacobi(start, [eqn1, eqn2], step=step)
+	gOut, gCount = gaussSeidel(start, [eqn1, eqn2], step=step)
 	
 	if showIts:
 		print("\n\nJacobi: ")
@@ -1330,10 +1339,13 @@ def iterative2D(tol, start, sysSelect, showIts):
 	plotIterative2D(ax, jOut, style='--o',label='Jacobi')
 	plotIterative2D(ax, gOut, style='--o', label='Gauss Seidel')
 
-	x0, x1 = gOut[-1]
+	# x0, x1 = gOut[-1]
 
-	x = np.linspace(x0-buf, x0+buf, 2)
-	y = np.linspace(x1-buf, x1+buf, 2)
+	# x = np.linspace(x0-buf, x0+buf, 2)
+	# y = np.linspace(x1-buf, x1+buf, 2)
+
+	x = np.linspace(-4, 4, 2)
+	y = np.linspace(-4, 4, 2)
 
 	ax.plot(x, eqn1(x, y))
 	ax.plot(x, eqn2(x, y))
@@ -1341,8 +1353,8 @@ def iterative2D(tol, start, sysSelect, showIts):
 	# ax.set_xlim(x0-buf, x0+buf)
 	# ax.set_ylim(x1-buf, x1+buf)
 
-	ax.set_xlim(0, 2)
-	ax.set_ylim(0, 2)
+	# ax.set_xlim(0, 2)
+	# ax.set_ylim(0, 2)
 
 
 	ax.legend()
