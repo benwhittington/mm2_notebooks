@@ -568,18 +568,35 @@ def EvenOdd():
     funcs = {"cos(x)":np.cos, "cos(2x)":cos2,"cos(2x)":cos2,"sin(x)":np.sin, "x^2":quad, "Odd Square":oddSquare, "Even Square":evenSquare}
     f1_drop = widgets.Dropdown(options=funcs)
     f2_drop = widgets.Dropdown(options=funcs)
+    sym_check = widgets.Checkbox(value=False, description="Check Symmetry")
 
     display(
         widgets.VBox([
             widgets.HBox([
                 f1_drop,
-                f2_drop
+                f2_drop,
+                sym_check
                 ]),
-            widgets.interactive_output(displayEvenOdd, {'f1':f1_drop, 'f2':f2_drop})
+            widgets.interactive_output(symmetryCheck, {'f1':f1_drop, 'f2':f2_drop, "showSym":sym_check})
         ])
     )
 
-def displayEvenOdd(f1, f2):
+def symmetryCheck(f1, f2, showSym):
+    
+    a_slider = widgets.FloatSlider(value=1, min=0, max=np.pi, step=0.1, continuous_update=False)
+
+    if not showSym:
+        displayEvenOdd(f1, f2)
+    else:
+        display(
+            widgets.VBox([
+                a_slider,
+                widgets.interactive_output(displayEvenOdd, {"f1":widgets.fixed(f1), "f2":widgets.fixed(f2), "a":a_slider})
+            ])
+        )
+    
+
+def displayEvenOdd(f1, f2, a=None):
     
     x = np.linspace(-np.pi, np.pi,200)
     
@@ -592,6 +609,16 @@ def displayEvenOdd(f1, f2):
     ax2.set_title('Function 2')
     ax3.plot(x, np.multiply(f1(x), f2(x)), color='C3')
     ax3.set_title('Function 1 * Function 2')
+
+    if a is not None:
+        ax1.plot(a, f1(a), marker=".", markersize="10", color="C4", label="f({})".format(a))
+        ax1.plot(-1*a, f1(a), marker=".", markersize="10", color="C5", label="f(-{})".format(a))
+
+        ax2.plot(a, f2(a), marker=".", markersize="10", color="C4", label="f({})".format(a))
+        ax2.plot(-1*a, f2(a), marker=".", markersize="10", color="C5", label="f(-{})".format(a))
+
+        ax1.legend()
+        ax2.legend()
 
     ax1.axvline(0, color='k', linewidth=0.5)
     ax2.axvline(0, color='k', linewidth=0.5)
@@ -609,6 +636,8 @@ def displayEvenOdd(f1, f2):
 
     ax3.yaxis.set_ticklabels([])
     ax3.yaxis.set_ticks([])
+
+    
 
     
 
