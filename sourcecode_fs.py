@@ -607,7 +607,7 @@ def displayEvenOdd(f1, f2, showArea, a=None):
 
     ax1.plot(x, f1(x), color='C0')
     ax1.set_title('Function 1')
-    ax2.plot(x, f2(x), color='C1')
+    ax2.plot(x, f2(x), color='C0')
     ax2.set_title('Function 2')
     ax3.plot(x, np.multiply(f1(x), f2(x)), color='C3')
     ax3.set_title('Function 1 * Function 2')
@@ -624,8 +624,11 @@ def displayEvenOdd(f1, f2, showArea, a=None):
 
     if showArea:
 
-        ax1.fill_between(x, f1(x), np.zeros(len(x)), color='C0', alpha=0.1)
-        ax2.fill_between(x, f2(x), np.zeros(len(x)), color='C1', alpha=0.1)
+        ax1.fill_between(x[:round(len(x)/2)], f1(x[:round(len(x)/2)]), np.zeros(round(len(x)/2)), color='C0', alpha=0.1)
+        ax1.fill_between(x[round(len(x)/2):], f1(x[round(len(x)/2):]), np.zeros(round(len(x)/2)), color='C3', alpha=0.1)
+
+        ax2.fill_between(x[:round(len(x)/2)], f2(x[:round(len(x)/2)]), np.zeros(round(len(x)/2)), color='C0', alpha=0.1)
+        ax2.fill_between(x[round(len(x)/2):], f2(x[round(len(x)/2):]), np.zeros(round(len(x)/2)), color='C3', alpha=0.1)
 
     ax1.axvline(0, color='k', linewidth=0.5)
     ax2.axvline(0, color='k', linewidth=0.5)
