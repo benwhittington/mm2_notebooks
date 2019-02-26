@@ -539,14 +539,33 @@ def exportWav(audioData):
 
 ##########
 
-def even(x):
-    return np.cos(x)
+def oddSquare(x):
+    ''' Square wave 
+               ~ -1, -1 < x < 0
+        f2(x)= |
+               ~  1,  0 < x < 1
+    '''
+    return signal.square(2*x)
 
-def odd(x):
-    return np.sin(x)
+def evenSquare(x):
+    ''' Square wave 
+               ~ -1, -1 < x < 0
+        f2(x)= |
+               ~  1,  0 < x < 1
+    '''
+    return signal.square(2*(x + np.pi/4))
+
+def cos2(x):
+    return np.cos(2*x)
+
+def sin2(x):
+    return np.sin(2*x)
+
+def quad(x):
+    return x**2
 
 def EvenOdd():
-    funcs = {"Even":even, "Odd":odd}
+    funcs = {"cos(x)":np.cos, "cos(2x)":cos2,"cos(2x)":cos2,"sin(x)":np.sin, "x^2":quad, "Odd Square":oddSquare, "Even Square":evenSquare}
     f1_drop = widgets.Dropdown(options=funcs)
     f2_drop = widgets.Dropdown(options=funcs)
 
@@ -562,7 +581,7 @@ def EvenOdd():
 
 def displayEvenOdd(f1, f2):
     
-    x = np.linspace(-np.pi, np.pi)
+    x = np.linspace(-np.pi, np.pi,200)
     
     fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(16, 8))
     fig.tight_layout()
@@ -577,6 +596,10 @@ def displayEvenOdd(f1, f2):
     ax1.axvline(0, color='k', linewidth=0.5)
     ax2.axvline(0, color='k', linewidth=0.5)
     ax3.axvline(0, color='k', linewidth=0.5)
+
+    ax1.axhline(0, color='k', linewidth=0.5)
+    ax2.axhline(0, color='k', linewidth=0.5)
+    ax3.axhline(0, color='k', linewidth=0.5)
 
     ax1.yaxis.set_ticklabels([])
     ax1.yaxis.set_ticks([])
