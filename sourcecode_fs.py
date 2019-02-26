@@ -569,34 +569,36 @@ def EvenOdd():
     f1_drop = widgets.Dropdown(options=funcs)
     f2_drop = widgets.Dropdown(options=funcs)
     sym_check = widgets.Checkbox(value=False, description="Check Symmetry")
+    area_check = widgets.Checkbox(value=False, description="Integration Region")
 
     display(
         widgets.VBox([
             widgets.HBox([
                 f1_drop,
                 f2_drop,
-                sym_check
+                sym_check,
+                area_check
                 ]),
-            widgets.interactive_output(symmetryCheck, {'f1':f1_drop, 'f2':f2_drop, "showSym":sym_check})
+            widgets.interactive_output(symmetryCheck, {'f1':f1_drop, 'f2':f2_drop, "showSym":sym_check, "showArea":area_check})
         ])
     )
 
-def symmetryCheck(f1, f2, showSym):
+def symmetryCheck(f1, f2, showSym, showArea):
     
     a_slider = widgets.FloatSlider(value=1, min=0, max=np.pi, step=0.1, continuous_update=False)
 
     if not showSym:
-        displayEvenOdd(f1, f2)
+        displayEvenOdd(f1, f2, showArea)
     else:
         display(
             widgets.VBox([
                 a_slider,
-                widgets.interactive_output(displayEvenOdd, {"f1":widgets.fixed(f1), "f2":widgets.fixed(f2), "a":a_slider})
+                widgets.interactive_output(displayEvenOdd, {"f1":widgets.fixed(f1), "f2":widgets.fixed(f2), "showArea":widgets.fixed(showArea), "a":a_slider})
             ])
         )
     
 
-def displayEvenOdd(f1, f2, a=None):
+def displayEvenOdd(f1, f2, showArea, a=None):
     
     x = np.linspace(-np.pi, np.pi,200)
     
@@ -611,14 +613,19 @@ def displayEvenOdd(f1, f2, a=None):
     ax3.set_title('Function 1 * Function 2')
 
     if a is not None:
-        ax1.plot(a, f1(a), marker=".", markersize="10", color="C4", label="f({})".format(a))
-        ax1.plot(-1*a, f1(a), marker=".", markersize="10", color="C5", label="f(-{})".format(a))
+        ax1.plot(a, f1(a), marker=".", markersize="15", color="C4", label="f({})".format(a))
+        ax1.plot(-1*a, f1(a), marker=".", markersize="15", color="C6", label="f(-{})".format(a))
 
-        ax2.plot(a, f2(a), marker=".", markersize="10", color="C4", label="f({})".format(a))
-        ax2.plot(-1*a, f2(a), marker=".", markersize="10", color="C5", label="f(-{})".format(a))
+        ax2.plot(a, f2(a), marker=".", markersize="15", color="C4", label="f({})".format(a))
+        ax2.plot(-1*a, f2(a), marker=".", markersize="15", color="C6", label="f(-{})".format(a))
 
         ax1.legend()
         ax2.legend()
+
+    if showArea:
+
+        ax1.fill_between(x, f1(x), np.zeros(len(x)), color='C0', alpha=0.1)
+        ax2.fill_between(x, f2(x), np.zeros(len(x)), color='C1', alpha=0.1)
 
     ax1.axvline(0, color='k', linewidth=0.5)
     ax2.axvline(0, color='k', linewidth=0.5)
@@ -628,18 +635,6 @@ def displayEvenOdd(f1, f2, a=None):
     ax2.axhline(0, color='k', linewidth=0.5)
     ax3.axhline(0, color='k', linewidth=0.5)
 
-    ax1.yaxis.set_ticklabels([])
-    ax1.yaxis.set_ticks([])
-
-    ax2.yaxis.set_ticklabels([])
-    ax2.yaxis.set_ticks([])
-
-    ax3.yaxis.set_ticklabels([])
-    ax3.yaxis.set_ticks([])
-
-    
-
-    
-
-    
-
+    ax1.set_xlim(-np.pi, np.pi)
+    ax2.set_xlim(-np.pi, np.pi)
+    ax3.set_xlim(-np.pi, np.pi)
