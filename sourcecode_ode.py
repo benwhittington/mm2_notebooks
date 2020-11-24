@@ -47,124 +47,106 @@ def ode0_ex_1_2(theta1_ini, theta2_ini, t, g, l):
 #  convolution functions
 
 def shortSW(t):
-    return [1 * (val > 0 and val < 2) for val in t]
-
-
-def longSW(t):
-    return [1 * (val > 0 and val < 4) for val in t]
-
-
-def poly(t):
-    return -0.25 * (t) * (t - 4)
-
-
-def convolveStep(func1, func2, tao):
-    """
-		Compute one step of convolution
-
-		----------
-
-		Parameters
-
-		----------
-
-		func1: callable
-			function to convolve
-
-		func2: callable
-			function to convolve
-
-		tao: float
-			dummy variable. Shift in t
-	"""
-    step = np.multiply(func1, func2)
-
-    return np.trapz(step, x=tao)
-
-
-def convoluteTo(f1, f2, t, tao):
-    """
-		Convolve based on t values to tmax
-
-		----------
-
-		Parameters
-
-		----------
-
-		func1: callable
-			function to convolve
-
-		func2: callable
-			function to convolve
-
-		t: array_like
-			time samples
-
-		tao: float
-			dummy variable. Shift in t
-
-		----------
-
-		Returns
-
-		----------
-
-		out: array_like
-			convolved function
-	"""
-    out = []
-    for i in t:
-        out.append(np.trapz(np.multiply(f1(i - tao), f2(tao)), x=tao))
+    f = lambda x: int(0 < x < 2)
+    try:
+        out = f(t)
+    except ValueError:
+        out = [f(val) for val in t]
 
     return out
 
 
-def convMain(tmax, func):
+def longSW(t):
+    f = lambda x: int(0 < x < 4)
+
+    try:
+        out = f(t)
+    except ValueError:
+        out = [f(val) for val in t]
+
+    return out
+
+
+def poly(t):
+    return -0.25 * t * (t - 4)
+
+
+def convolve(f1, f2, x, x_stop=None):
+
+    if x_stop is not None:
+        # print(np.nonzero(x <= x_stop))
+        x = x[np.nonzero(x <= x_stop)]
+
+    out = np.zeros(x.shape)
+
+    for i, xi in enumerate(x):
+        for xk in x:
+            out[i] += f1(xk) * f2(xi - xk)
+
+    return x, out
+
+
+def convMain(tStop, func):
     """
-		Main function for producing convolution and plotting result
+        Main function for producing convolution and plotting result
 
-		----------
+        ----------
 
-		Parameters
+        Parameters
 
-		----------
+        ----------
 
-		tmax: float
-			max t value
+        tmax: float
+            max t value
 
-		func: string
-			function key for selecting function
-	"""
+        func: string
+            function key for selecting function
+    """
     _, (ax1, ax2) = plt.subplots(2, figsize=(16, 8))
 
     f1 = shortSW
-    tao = np.linspace(-10, 10, 1000)
-    t = np.arange(-5, tmax, 0.5)
+    tMin, tMax = -10, 10
+    t = np.linspace(tMin, tMax, 500)
 
-    if func == 'f1':
-        func2 = shortSW(tmax - tao - 0.5)
-        f2 = shortSW
+    # some hard coded values
+    funcs = {
+        "f1": shortSW,
+        "f2": longSW,
+        "f3": poly
+             }
 
-    elif func == 'f2':
-        func2 = longSW(tmax - tao - 0.5)
-        f2 = longSW
+    # width of non-zero part of function
+    width = {
+        "f1": 2,
+        "f2": 4,
+        "f3": 4
+    }
 
-    elif func == 'f3':
-        func2 = poly(tmax - tao - 1.5)
-        f2 = poly
+    # maximum value of complete convolution (for y limit)
+    maxVal = {
+        "f1": 99,
+        "f2": 100,
+        "f3": 45.815
+    }
 
-    func1 = f1(tao)
-    conv = convoluteTo(f1, f2, t, tao)
+    try:
+        f2 = funcs[func]
+        w = width[func]
+        yMax = maxVal[func]
+    except KeyError:
+        print("something went wrong, blame Ben :/")
+        return
 
-    ax1.plot(tao, func1)
-    ax1.plot(tao, func2)
-    ax1.set_xlim(-10, 10)
+    conv = convolve(f1, f2, t, x_stop=tStop)
+
+    ax1.plot(t, f1(t))
+    ax1.plot(t, f2(t - tStop + w))
+    ax1.set_xlim(tMin, tMax)
     ax1.set_ylim(0, 1.2)
 
-    ax2.plot(t, conv)
-    ax2.set_xlim(-10, 10)
-    ax2.set_ylim(0, 4)
+    ax2.plot(*conv)
+    ax2.set_xlim(tMin, tMax)
+    ax2.set_ylim(0, yMax * 1.1)
 
     ax1.set_xlabel('Tau')
     ax1.yaxis.set_ticks([])
@@ -184,11 +166,11 @@ def Convolution():
 	"""
     t_sldr = widgets.FloatSlider(value=-5, min=-5, max=7, step=0.5, description='$t$', continuous_update=False)
     #  f3 doesn't really work properly
-    # f_drp = widgets.Dropdown(options=['f1', 'f2', 'f3'])
-    f_drp = widgets.Dropdown(options=['f1', 'f2'])
+    f_drp = widgets.Dropdown(options=['f1', 'f2', 'f3'])
+    # f_drp = widgets.Dropdown(options=['f1', 'f2'])
 
     return widgets.VBox(
-        [widgets.HBox([t_sldr, f_drp]), widgets.interactive_output(convMain, {'tmax': t_sldr, 'func': f_drp})])
+        [widgets.HBox([t_sldr, f_drp]), widgets.interactive_output(convMain, {'tStop': t_sldr, 'func': f_drp})])
 
 
 ##########
@@ -1134,4 +1116,6 @@ def pendMain():
 
 if __name__ == "__main__":
     # pendMain()
-    Pendulum()
+    # Pendulum()
+    pass
+    # convMain(0, "f1")
