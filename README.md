@@ -1,5 +1,13 @@
 # mm2_notebooks
 
+## Requires
+python3
+numpy
+matplotlib
+ipywidgets
+scipy
+ipython
+
 ## Available Notebook Functions
 
 ### ODE
